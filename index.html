@@ -3,17 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Robin Apps</title>
-<link rel="stylesheet" href="style.css">
+
 <link rel="manifest" href="manifest.json">
+
 <meta name="theme-color" content="#111111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Robin Apps">
+
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="launcher" class="screen">
+
     <h1>Robin Apps</h1>
 
     <div class="card" onclick="showScreen('hello')">
@@ -25,27 +30,39 @@
         <h2>Fitness Tracker</h2>
         <p>Kalorien & Makros</p>
     </div>
+
 </div>
 
 <div id="hello" class="screen hidden">
-    <button onclick="showScreen('launcher')">← Zurück</button>
+
+    <button onclick="showScreen('launcher')">
+        ← Zurück
+    </button>
+
     <h1>Hello World 👋</h1>
+
 </div>
 
 <div id="fitness" class="screen hidden">
-    <button onclick="showScreen('launcher')">← Zurück</button>
+
+    <button onclick="showScreen('launcher')">
+        ← Zurück
+    </button>
 
     <h1>Fitness Tracker</h1>
 
     <div class="stats">
+
         <div class="stat">
             <span>Kalorien</span>
             <strong id="totalCalories">0</strong>
+            <small id="calorieGoalLabel">/ 2200</small>
         </div>
 
         <div class="stat">
             <span>Protein</span>
             <strong id="totalProtein">0g</strong>
+            <small id="proteinGoalLabel">/ 180g</small>
         </div>
 
         <div class="stat">
@@ -57,36 +74,117 @@
             <span>Fett</span>
             <strong id="totalFat">0g</strong>
         </div>
+
     </div>
+
+    <h2>Ziele</h2>
+
+    <input
+        id="goalCalories"
+        type="number"
+        placeholder="Kalorienziel"
+    >
+
+    <input
+        id="goalProtein"
+        type="number"
+        placeholder="Proteinziel"
+    >
+
+    <button onclick="saveGoals()">
+        Ziele speichern
+    </button>
 
     <h2>Lebensmittel hinzufügen</h2>
 
     <input id="name" placeholder="Name">
-    <input id="calories" type="number" placeholder="Kalorien">
-    <input id="protein" type="number" placeholder="Protein">
-    <input id="carbs" type="number" placeholder="Carbs">
-    <input id="fat" type="number" placeholder="Fett">
 
-    <button onclick="addFood()">Speichern</button>
+    <input
+        id="calories"
+        type="number"
+        placeholder="Kalorien"
+    >
+
+    <input
+        id="protein"
+        type="number"
+        placeholder="Protein"
+    >
+
+    <input
+        id="carbs"
+        type="number"
+        placeholder="Carbs"
+    >
+
+    <input
+        id="fat"
+        type="number"
+        placeholder="Fett"
+    >
+
+    <button onclick="addFood()">
+        Speichern
+    </button>
 
     <h2>Heute</h2>
 
     <div id="foodList"></div>
+
 </div>
 
 <script>
+
 function showScreen(screenId){
-    document.querySelectorAll('.screen')
+
+    document
+        .querySelectorAll('.screen')
         .forEach(el => el.classList.add('hidden'));
 
-    document.getElementById(screenId)
+    document
+        .getElementById(screenId)
         .classList.remove('hidden');
 }
 
-let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+let foods = JSON.parse(
+    localStorage.getItem('foods') || '[]'
+);
+
+let goals = JSON.parse(
+    localStorage.getItem('goals') ||
+    '{"calories":2200,"protein":180}'
+);
+
+document.getElementById('goalCalories').value =
+    goals.calories;
+
+document.getElementById('goalProtein').value =
+    goals.protein;
 
 function saveFoods(){
-    localStorage.setItem('foods', JSON.stringify(foods));
+    localStorage.setItem(
+        'foods',
+        JSON.stringify(foods)
+    );
+}
+
+function saveGoals(){
+
+    goals = {
+        calories: Number(
+            document.getElementById('goalCalories').value
+        ),
+        protein: Number(
+            document.getElementById('goalProtein').value
+        )
+    };
+
+    localStorage.setItem(
+        'goals',
+        JSON.stringify(goals)
+    );
+
+    renderFoods();
 }
 
 function addFood(){
@@ -104,6 +202,7 @@ function addFood(){
     foods.push(food);
 
     saveFoods();
+
     renderFoods();
 
     document.getElementById('name').value = '';
@@ -115,7 +214,8 @@ function addFood(){
 
 function renderFoods(){
 
-    const list = document.getElementById('foodList');
+    const list =
+        document.getElementById('foodList');
 
     let calories = 0;
     let protein = 0;
@@ -131,7 +231,8 @@ function renderFoods(){
         carbs += food.carbs;
         fat += food.fat;
 
-        const div = document.createElement('div');
+        const div =
+            document.createElement('div');
 
         div.className = 'food-item';
 
@@ -144,20 +245,35 @@ function renderFoods(){
         `;
 
         list.appendChild(div);
+
     });
 
-    document.getElementById('totalCalories').textContent = calories;
-    document.getElementById('totalProtein').textContent = protein + 'g';
-    document.getElementById('totalCarbs').textContent = carbs + 'g';
-    document.getElementById('totalFat').textContent = fat + 'g';
+    document.getElementById('totalCalories').textContent =
+        calories;
+
+    document.getElementById('totalProtein').textContent =
+        protein + 'g';
+
+    document.getElementById('totalCarbs').textContent =
+        carbs + 'g';
+
+    document.getElementById('totalFat').textContent =
+        fat + 'g';
+
+    document.getElementById('calorieGoalLabel').textContent =
+        '/ ' + goals.calories;
+
+    document.getElementById('proteinGoalLabel').textContent =
+        '/ ' + goals.protein + 'g';
 }
 
 renderFoods();
-</script>
-<script>
+
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js');
 }
+
 </script>
+
 </body>
 </html>

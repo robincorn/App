@@ -1,28 +1,154 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World</title>
-
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #111;
-            color: white;
-        }
-
-        h1 {
-            font-size: 3rem;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robin Apps</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<div id="launcher" class="screen">
+    <h1>Robin Apps</h1>
+
+    <div class="card" onclick="showScreen('hello')">
+        <h2>Hello World</h2>
+        <p>Test-App</p>
+    </div>
+
+    <div class="card" onclick="showScreen('fitness')">
+        <h2>Fitness Tracker</h2>
+        <p>Kalorien & Makros</p>
+    </div>
+</div>
+
+<div id="hello" class="screen hidden">
+    <button onclick="showScreen('launcher')">← Zurück</button>
     <h1>Hello World 👋</h1>
+</div>
+
+<div id="fitness" class="screen hidden">
+    <button onclick="showScreen('launcher')">← Zurück</button>
+
+    <h1>Fitness Tracker</h1>
+
+    <div class="stats">
+        <div class="stat">
+            <span>Kalorien</span>
+            <strong id="totalCalories">0</strong>
+        </div>
+
+        <div class="stat">
+            <span>Protein</span>
+            <strong id="totalProtein">0g</strong>
+        </div>
+
+        <div class="stat">
+            <span>Carbs</span>
+            <strong id="totalCarbs">0g</strong>
+        </div>
+
+        <div class="stat">
+            <span>Fett</span>
+            <strong id="totalFat">0g</strong>
+        </div>
+    </div>
+
+    <h2>Lebensmittel hinzufügen</h2>
+
+    <input id="name" placeholder="Name">
+    <input id="calories" type="number" placeholder="Kalorien">
+    <input id="protein" type="number" placeholder="Protein">
+    <input id="carbs" type="number" placeholder="Carbs">
+    <input id="fat" type="number" placeholder="Fett">
+
+    <button onclick="addFood()">Speichern</button>
+
+    <h2>Heute</h2>
+
+    <div id="foodList"></div>
+</div>
+
+<script>
+function showScreen(screenId){
+    document.querySelectorAll('.screen')
+        .forEach(el => el.classList.add('hidden'));
+
+    document.getElementById(screenId)
+        .classList.remove('hidden');
+}
+
+let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+
+function saveFoods(){
+    localStorage.setItem('foods', JSON.stringify(foods));
+}
+
+function addFood(){
+
+    const food = {
+        name: document.getElementById('name').value,
+        calories: Number(document.getElementById('calories').value),
+        protein: Number(document.getElementById('protein').value),
+        carbs: Number(document.getElementById('carbs').value),
+        fat: Number(document.getElementById('fat').value)
+    };
+
+    if(!food.name) return;
+
+    foods.push(food);
+
+    saveFoods();
+    renderFoods();
+
+    document.getElementById('name').value = '';
+    document.getElementById('calories').value = '';
+    document.getElementById('protein').value = '';
+    document.getElementById('carbs').value = '';
+    document.getElementById('fat').value = '';
+}
+
+function renderFoods(){
+
+    const list = document.getElementById('foodList');
+
+    let calories = 0;
+    let protein = 0;
+    let carbs = 0;
+    let fat = 0;
+
+    list.innerHTML = '';
+
+    foods.forEach(food => {
+
+        calories += food.calories;
+        protein += food.protein;
+        carbs += food.carbs;
+        fat += food.fat;
+
+        const div = document.createElement('div');
+
+        div.className = 'food-item';
+
+        div.innerHTML = `
+            <strong>${food.name}</strong><br>
+            ${food.calories} kcal |
+            P ${food.protein}g |
+            C ${food.carbs}g |
+            F ${food.fat}g
+        `;
+
+        list.appendChild(div);
+    });
+
+    document.getElementById('totalCalories').textContent = calories;
+    document.getElementById('totalProtein').textContent = protein + 'g';
+    document.getElementById('totalCarbs').textContent = carbs + 'g';
+    document.getElementById('totalFat').textContent = fat + 'g';
+}
+
+renderFoods();
+</script>
+
 </body>
 </html>

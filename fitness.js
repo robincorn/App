@@ -1,5 +1,7 @@
-let foods = JSON.parse(
-    localStorage.getItem('foods') || '[]'
+const today = new Date().toISOString().split('T')[0];
+
+let entries = JSON.parse(
+    localStorage.getItem('entries') || '{}'
 );
 
 let goals = JSON.parse(
@@ -7,7 +9,11 @@ let goals = JSON.parse(
     '{"calories":2200,"protein":180}'
 );
 
-function initFitness(){
+if (!entries[today]) {
+    entries[today] = [];
+}
+
+function initFitness() {
 
     document.getElementById('goalCalories').value =
         goals.calories;
@@ -18,15 +24,15 @@ function initFitness(){
     renderFoods();
 }
 
-function saveFoods(){
+function saveEntries() {
 
     localStorage.setItem(
-        'foods',
-        JSON.stringify(foods)
+        'entries',
+        JSON.stringify(entries)
     );
 }
 
-function saveGoals(){
+function saveGoals() {
 
     goals = {
         calories: Number(
@@ -45,22 +51,30 @@ function saveGoals(){
     renderFoods();
 }
 
-function addFood(){
+function addFood() {
 
     const food = {
         id: Date.now(),
         name: document.getElementById('name').value,
-        calories: Number(document.getElementById('calories').value),
-        protein: Number(document.getElementById('protein').value),
-        carbs: Number(document.getElementById('carbs').value),
-        fat: Number(document.getElementById('fat').value)
+        calories: Number(
+            document.getElementById('calories').value
+        ),
+        protein: Number(
+            document.getElementById('protein').value
+        ),
+        carbs: Number(
+            document.getElementById('carbs').value
+        ),
+        fat: Number(
+            document.getElementById('fat').value
+        )
     };
 
-    if(!food.name) return;
+    if (!food.name) return;
 
-    foods.push(food);
+    entries[today].push(food);
 
-    saveFoods();
+    saveEntries();
 
     renderFoods();
 
@@ -71,18 +85,20 @@ function addFood(){
     document.getElementById('fat').value = '';
 }
 
-function deleteFood(id){
+function deleteFood(id) {
 
-    foods = foods.filter(
+    entries[today] = entries[today].filter(
         food => food.id !== id
     );
 
-    saveFoods();
+    saveEntries();
 
     renderFoods();
 }
 
-function renderFoods(){
+function renderFoods() {
+
+    const foods = entries[today] || [];
 
     const list =
         document.getElementById('foodList');
@@ -121,22 +137,30 @@ function renderFoods(){
         list.appendChild(div);
     });
 
-    document.getElementById('totalCalories').textContent =
-        calories;
+    document.getElementById(
+        'totalCalories'
+    ).textContent = calories;
 
-    document.getElementById('totalProtein').textContent =
-        protein + 'g';
+    document.getElementById(
+        'totalProtein'
+    ).textContent = protein + 'g';
 
-    document.getElementById('totalCarbs').textContent =
-        carbs + 'g';
+    document.getElementById(
+        'totalCarbs'
+    ).textContent = carbs + 'g';
 
-    document.getElementById('totalFat').textContent =
-        fat + 'g';
+    document.getElementById(
+        'totalFat'
+    ).textContent = fat + 'g';
 
-    document.getElementById('calorieGoalLabel').textContent =
+    document.getElementById(
+        'calorieGoalLabel'
+    ).textContent =
         '/ ' + goals.calories;
 
-    document.getElementById('proteinGoalLabel').textContent =
+    document.getElementById(
+        'proteinGoalLabel'
+    ).textContent =
         '/ ' + goals.protein + 'g';
 }
 

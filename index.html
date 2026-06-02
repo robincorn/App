@@ -7,14 +7,14 @@
 <title>Robin Apps</title>
 
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
 
 <meta name="theme-color" content="#111111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Robin Apps">
-
-<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <div id="launcher" class="screen">
@@ -51,230 +51,163 @@
 
     <h1>Fitness Tracker</h1>
 
-    <div class="stats">
+    <div class="tabs">
 
-        <div class="stat">
-            <span>Kalorien</span>
-            <strong id="totalCalories">0</strong>
-            <small id="calorieGoalLabel">/ 2200</small>
-        </div>
+        <button onclick="showFitnessTab('today')">
+            Heute
+        </button>
 
-        <div class="stat">
-            <span>Protein</span>
-            <strong id="totalProtein">0g</strong>
-            <small id="proteinGoalLabel">/ 180g</small>
-        </div>
+        <button onclick="showFitnessTab('history')">
+            Verlauf
+        </button>
 
-        <div class="stat">
-            <span>Carbs</span>
-            <strong id="totalCarbs">0g</strong>
-        </div>
+        <button onclick="showFitnessTab('weight')">
+            Gewicht
+        </button>
 
-        <div class="stat">
-            <span>Fett</span>
-            <strong id="totalFat">0g</strong>
-        </div>
+        <button onclick="showFitnessTab('settings')">
+            Ziele
+        </button>
 
     </div>
 
-    <h2>Ziele</h2>
+    <div id="tab-today" class="fitness-tab">
 
-    <input
-        id="goalCalories"
-        type="number"
-        placeholder="Kalorienziel"
+        <div class="stats">
+
+            <div class="stat">
+                <span>Kalorien</span>
+                <strong id="totalCalories">0</strong>
+                <small id="calorieGoal"></small>
+            </div>
+
+            <div class="stat">
+                <span>Protein</span>
+                <strong id="totalProtein">0g</strong>
+                <small id="proteinGoal"></small>
+            </div>
+
+            <div class="stat">
+                <span>Carbs</span>
+                <strong id="totalCarbs">0g</strong>
+            </div>
+
+            <div class="stat">
+                <span>Fett</span>
+                <strong id="totalFat">0g</strong>
+            </div>
+
+        </div>
+
+        <div class="quick-actions">
+
+            <button>
+                📷 Foto
+            </button>
+
+            <button>
+                📦 Barcode
+            </button>
+
+        </div>
+
+        <h2>Essen hinzufügen</h2>
+
+        <input id="foodName" placeholder="Name">
+
+        <input
+            id="foodCalories"
+            type="number"
+            placeholder="Kalorien"
+        >
+
+        <input
+            id="foodProtein"
+            type="number"
+            placeholder="Protein"
+        >
+
+        <input
+            id="foodCarbs"
+            type="number"
+            placeholder="Carbs"
+        >
+
+        <input
+            id="foodFat"
+            type="number"
+            placeholder="Fett"
+        >
+
+        <button onclick="addFood()">
+            Speichern
+        </button>
+
+        <div id="foodList"></div>
+
+    </div>
+
+    <div
+        id="tab-history"
+        class="fitness-tab hidden"
     >
 
-    <input
-        id="goalProtein"
-        type="number"
-        placeholder="Proteinziel"
+        <h2>Verlauf</h2>
+
+        <div id="historyList"></div>
+
+    </div>
+
+    <div
+        id="tab-weight"
+        class="fitness-tab hidden"
     >
 
-    <button onclick="saveGoals()">
-        Ziele speichern
-    </button>
+        <h2>Gewicht</h2>
 
-    <h2>Lebensmittel hinzufügen</h2>
+        <input
+            id="weightInput"
+            type="number"
+            step="0.1"
+            placeholder="82.5"
+        >
 
-    <input id="name" placeholder="Name">
+        <button onclick="addWeight()">
+            Gewicht speichern
+        </button>
 
-    <input
-        id="calories"
-        type="number"
-        placeholder="Kalorien"
+        <div id="weightList"></div>
+
+    </div>
+
+    <div
+        id="tab-settings"
+        class="fitness-tab hidden"
     >
 
-    <input
-        id="protein"
-        type="number"
-        placeholder="Protein"
-    >
+        <h2>Ziele</h2>
 
-    <input
-        id="carbs"
-        type="number"
-        placeholder="Carbs"
-    >
+        <input
+            id="goalCalories"
+            type="number"
+            placeholder="Kalorienziel"
+        >
 
-    <input
-        id="fat"
-        type="number"
-        placeholder="Fett"
-    >
+        <input
+            id="goalProtein"
+            type="number"
+            placeholder="Proteinziel"
+        >
 
-    <button onclick="addFood()">
-        Speichern
-    </button>
+        <button onclick="saveGoals()">
+            Ziele speichern
+        </button>
 
-    <h2>Heute</h2>
-
-    <div id="foodList"></div>
+    </div>
 
 </div>
 
-<script>
-
-function showScreen(screenId){
-
-    document
-        .querySelectorAll('.screen')
-        .forEach(el => el.classList.add('hidden'));
-
-    document
-        .getElementById(screenId)
-        .classList.remove('hidden');
-}
-
-let foods = JSON.parse(
-    localStorage.getItem('foods') || '[]'
-);
-
-let goals = JSON.parse(
-    localStorage.getItem('goals') ||
-    '{"calories":2200,"protein":180}'
-);
-
-document.getElementById('goalCalories').value =
-    goals.calories;
-
-document.getElementById('goalProtein').value =
-    goals.protein;
-
-function saveFoods(){
-    localStorage.setItem(
-        'foods',
-        JSON.stringify(foods)
-    );
-}
-
-function saveGoals(){
-
-    goals = {
-        calories: Number(
-            document.getElementById('goalCalories').value
-        ),
-        protein: Number(
-            document.getElementById('goalProtein').value
-        )
-    };
-
-    localStorage.setItem(
-        'goals',
-        JSON.stringify(goals)
-    );
-
-    renderFoods();
-}
-
-function addFood(){
-
-    const food = {
-        name: document.getElementById('name').value,
-        calories: Number(document.getElementById('calories').value),
-        protein: Number(document.getElementById('protein').value),
-        carbs: Number(document.getElementById('carbs').value),
-        fat: Number(document.getElementById('fat').value)
-    };
-
-    if(!food.name) return;
-
-    foods.push(food);
-
-    saveFoods();
-
-    renderFoods();
-
-    document.getElementById('name').value = '';
-    document.getElementById('calories').value = '';
-    document.getElementById('protein').value = '';
-    document.getElementById('carbs').value = '';
-    document.getElementById('fat').value = '';
-}
-
-function renderFoods(){
-
-    const list =
-        document.getElementById('foodList');
-
-    let calories = 0;
-    let protein = 0;
-    let carbs = 0;
-    let fat = 0;
-
-    list.innerHTML = '';
-
-    foods.forEach(food => {
-
-        calories += food.calories;
-        protein += food.protein;
-        carbs += food.carbs;
-        fat += food.fat;
-
-        const div =
-            document.createElement('div');
-
-        div.className = 'food-item';
-
-        div.innerHTML = `
-            <strong>${food.name}</strong><br>
-            ${food.calories} kcal |
-            P ${food.protein}g |
-            C ${food.carbs}g |
-            F ${food.fat}g
-        `;
-
-        list.appendChild(div);
-
-    });
-
-    document.getElementById('totalCalories').textContent =
-        calories;
-
-    document.getElementById('totalProtein').textContent =
-        protein + 'g';
-
-    document.getElementById('totalCarbs').textContent =
-        carbs + 'g';
-
-    document.getElementById('totalFat').textContent =
-        fat + 'g';
-
-    document.getElementById('calorieGoalLabel').textContent =
-        '/ ' + goals.calories;
-
-    document.getElementById('proteinGoalLabel').textContent =
-        '/ ' + goals.protein + 'g';
-}
-
-renderFoods();
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js');
-}
-
-</script>
 <script src="app.js"></script>
-<script src="fitness.js"></script>
+
 </body>
 </html>
